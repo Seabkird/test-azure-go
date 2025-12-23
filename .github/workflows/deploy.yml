@@ -20,6 +20,11 @@ jobs:
     - name: Checkout du code
       uses: actions/checkout@v4
 
+    - name: Connexion à Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Configuration de Go
       uses: actions/setup-go@v5
       with:
@@ -38,4 +43,3 @@ jobs:
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: '.' # On déploie tout le dossier courant (qui contient main, host.json, etc.)
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
