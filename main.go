@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 // Structure pour la réponse JSON
@@ -22,7 +23,7 @@ type Utilisateur struct {
 func main() {
 	// 1. Route simple (Texte brut)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Bienvenue sur ton API Go minimaliste !")
+		fmt.Fprintf(w, "Bienvenue sur ton API Go minimaliste test mdr!")
 	})
 
 	// 2. Route API (Retourne du JSON)
@@ -45,11 +46,15 @@ func main() {
 	})
 
 	// 3. Lancement du serveur
-	port := ":8080"
+	port := os.Getenv("FUNCTIONS_CUSTOMHANDLER_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	fmt.Println("Serveur lancé sur http://localhost" + port)
 
 	// Bloque le programme et écoute les requêtes
-	err := http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal("Erreur lors du lancement du serveur : ", err)
 	}
