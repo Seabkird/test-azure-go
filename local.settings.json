@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "custom",
+    "COSMOS_KEY": "votre_clé_ici",
+    "COSMOS_ENDPOINT": "votre_endpoint_ici"
+  }
+}
