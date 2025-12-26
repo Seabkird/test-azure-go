@@ -50,7 +50,7 @@ func TestCosmosAdapter_Integration(t *testing.T) {
 	}
 
 	// GET
-	got, err := repo.Get(ctx, user.ID, user.ID)
+	got, err := repo.Read(ctx, user.ID, user.ID)
 	if err != nil {
 		t.Fatalf("Get failed: %v", err)
 	}
@@ -64,7 +64,7 @@ func TestCosmosAdapter_Integration(t *testing.T) {
 	}
 
 	// VERIFY DELETE (Should fail)
-	_, err = repo.Get(ctx, user.ID, user.ID)
+	_, err = repo.Read(ctx, user.ID, user.ID)
 	if err == nil {
 		t.Error("Expected error after delete, got nil")
 	}

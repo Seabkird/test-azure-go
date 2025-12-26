@@ -9,6 +9,7 @@ import (
 	"test-api/kit/database"
 	"test-api/kit/database/cosmos"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/data/azcosmos"
 )
 
@@ -19,9 +20,19 @@ type App struct {
 
 func main() {
 	// 1. Initialisation (Config, DB, etc.)
-	cred, _ := azcosmos.NewKeyCredential(os.Getenv("COSMOS_KEY"))
-	client, _ := azcosmos.NewClientWithKey(os.Getenv("COSMOS_ENDPOINT"), cred, nil)
-	repo, _ := cosmos.NewAdapter[User](client, "DB", "Container")
+
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	if err != nil {
+		log.Fatalf("Erreur de credential: %v", err)
+	}
+
+	endpoint := os.Getenv("COSMOS_ENDPOINT")
+	client, err := azcosmos.NewClient(endpoint, cred, nil)
+	if err != nil {
+		log.Fatalf("Erreur création client Cosmos: %v", err)
+	}
+
+	repo, _ := cosmos.NewAdapter[User](client, "TestDB", "NomContainer")
 
 	// 2. Création de l'application avec ses dépendances
 	app := &App{
@@ -36,7 +47,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: app.Routes(), // On appelle notre fonction de routing
+		Handler: app.Routes(),
 	}
 
 	fmt.Println("Serveur lancé sur http://localhost:" + port)

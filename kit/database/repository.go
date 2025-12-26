@@ -13,7 +13,7 @@ type Entity interface {
 // Repository définit les opérations CRUD standard.
 type Repository[T Entity] interface {
 	Create(ctx context.Context, item T) error
-	Get(ctx context.Context, id string, partitionKey string) (T, error)
+	Read(ctx context.Context, id string, partitionKey string) (T, error)
 	Update(ctx context.Context, item T) error
 	Delete(ctx context.Context, id string, partitionKey string) error
 	// Tu pourras ajouter Query() plus tard

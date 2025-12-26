@@ -47,7 +47,7 @@ func (a *Adapter[T]) Create(ctx context.Context, item T) error {
 	return err
 }
 
-func (a *Adapter[T]) Get(ctx context.Context, id string, partitionKey string) (T, error) {
+func (a *Adapter[T]) Read(ctx context.Context, id string, partitionKey string) (T, error) {
 	var item T
 	// Création d'une instance vide pour éviter le nil pointer si T est un pointeur
 	// Note: avec les génériques, c'est parfois tricky, l'appelant recevra la zero-value en cas d'erreur.

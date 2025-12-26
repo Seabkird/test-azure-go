@@ -7,11 +7,14 @@ func (app *App) Routes() http.Handler {
 	mux := http.NewServeMux()
 
 	// Tes routes existantes
-	mux.HandleFunc("GET /", app.HandleHome) // Note: "GET /" marche avec Go 1.22+
-	mux.HandleFunc("GET /api/info", app.HandleInfo)
+	mux.HandleFunc("GET /", HandleHome) // Note: "GET /" marche avec Go 1.22+
+	mux.HandleFunc("GET /api/info", HandleInfo)
 
-	// Exemple futur pour ton CRUD User (quand tu seras prêt)
-	//mux.HandleFunc("POST /api/users", app.HandleCreateUser)
+	// --- Routes CRUD User ---
+	mux.HandleFunc("POST /api/user", app.HandleCreateUser)
+	mux.HandleFunc("GET /api/user/{id}", app.HandleGetUser)
+	mux.HandleFunc("PUT /api/user/{id}", app.HandleUpdateUser)
+	mux.HandleFunc("DELETE /api/user/{id}", app.HandleDeleteUser)
 
 	return mux
 }
