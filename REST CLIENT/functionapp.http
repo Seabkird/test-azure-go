@@ -1,4 +1,0 @@
-
-GET https://testing-go-hdg0a0fka7b3gsc4.francecentral-01.azurewebsites.net/
-Authorization: Bearer {{$aadV2Token new scopes:api://36b9d25c-e423-4acd-a704-f9b82c95adfa/.default}}
-Content-Type: application/json

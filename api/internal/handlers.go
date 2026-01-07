@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -26,7 +25,13 @@ func (u User) GetID() string { return u.Nom }
 
 // HandleHome : Ta route texte simple
 func HandleHome(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Bienvenue sur ton API Go minimaliste test mdr v2!")
+	w.Header().Set("Content-Type", "application/json")
+
+	response := map[string]string{
+		"message": "Bienvenue sur ton API Go minimaliste test mdr v2!",
+	}
+
+	json.NewEncoder(w).Encode(response)
 }
 
 // HandleInfo : Ta route JSON
