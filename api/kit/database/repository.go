@@ -8,6 +8,7 @@ import (
 // Cosmos DB a besoin d'un champ "id" en minuscule JSON.
 type Entity interface {
 	GetID() string
+	GetTenantID() string
 }
 
 // Repository définit les opérations CRUD standard.

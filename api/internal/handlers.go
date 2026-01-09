@@ -23,7 +23,8 @@ type User struct {
 	Prenom   string `json:"prenom"`
 }
 
-func (u User) GetID() string { return u.Id }
+func (u User) GetID() string       { return u.Id }
+func (u User) GetTenantID() string { return u.TenantID }
 
 // HandleHome : Ta route texte simple
 func HandleHome(w http.ResponseWriter, r *http.Request) {

@@ -33,10 +33,7 @@ func NewAdapter[T database.Entity](client *azcosmos.Client, dbName, containerNam
 }
 
 func (a *Adapter[T]) Create(ctx context.Context, item T) error {
-	// PartitionKey: Dans Cosmos, il faut savoir quelle est ta PK.
-	// Pour simplifier ici, on suppose que la PK est l'ID ou gérée par l'objet,
-	// mais souvent on passe une PartitionKey explicite.
-	pk := azcosmos.NewPartitionKeyString(item.GetID())
+	pk := azcosmos.NewPartitionKeyString(item.GetTenantID())
 
 	b, err := json.Marshal(item)
 	if err != nil {
