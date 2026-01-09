@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -70,6 +71,7 @@ func (app *App) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.userRepo.Update(r.Context(), user); err != nil {
 		http.Error(w, "Erreur lors de la mise à jour", http.StatusInternalServerError)
+		log.Fatalf("Erreur création client Cosmos: %v", err)
 		return
 	}
 
