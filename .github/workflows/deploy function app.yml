@@ -32,8 +32,9 @@ jobs:
 
     - name: Build du binaire
       run: |
+        cd api
         # Compilation croisée pour Linux (Architecture AMD64 standard pour Azure)
-        GOOS=linux GOARCH=amd64 go build -o ${{ env.BINARY_NAME }} ./api/internal
+        GOOS=linux GOARCH=amd64 go build -o ${{ env.BINARY_NAME }} ./internal
         
         # Donner les droits d'exécution (CRITIQUE pour que Azure puisse le lancer)
         chmod +x ${{ env.BINARY_NAME }}
@@ -42,4 +43,4 @@ jobs:
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: '.' # On déploie tout le dossier courant (qui contient main, host.json, etc.)
+        package: './api'
