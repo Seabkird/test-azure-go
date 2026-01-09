@@ -61,7 +61,7 @@ func (a *Adapter[T]) Read(ctx context.Context, id string, partitionKey string) (
 }
 
 func (a *Adapter[T]) Update(ctx context.Context, item T) error {
-	pk := azcosmos.NewPartitionKeyString(item.GetID())
+	pk := azcosmos.NewPartitionKeyString(item.GetTenantID())
 
 	b, err := json.Marshal(item)
 	if err != nil {
