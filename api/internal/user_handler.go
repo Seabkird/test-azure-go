@@ -2,62 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
 )
-
-// Tes structs de réponse (gardées ici pour l'exemple)
-type Reponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-	User    User   `json:"user"`
-}
-
-type User struct {
-	//C'est crucial pour la performance et la sécurité des données entre tes clients.
-	TenantID string `json:"tenantID"` // Ta Partition Key (PK)Utilise le TenantID comme clé de partition (Partition Key).
-	Id       string `json:"id"`
-	Nom      string `json:"nom"`
-	Prenom   string `json:"prenom"`
-}
-
-func (u User) GetID() string       { return u.Id }
-func (u User) GetTenantID() string { return u.TenantID }
-
-// HandleHome : Ta route texte simple
-func HandleHome(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	response := map[string]string{
-		"message": "Bienvenue sur ton API Go minimaliste test mdr v2!",
-	}
-
-	json.NewEncoder(w).Encode(response)
-}
-
-// HandleInfo : Ta route JSON
-func HandleInfo(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var u User
-	err := json.NewDecoder(r.Body).Decode(&u)
-
-	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		log.Println("Error decoding JSON:", err)
-		return
-	}
-
-	data := Reponse{
-		Status:  "success",
-		Message: "Ceci est une réponse JSON depuis Go",
-		User:    u,
-	}
-
-	json.NewEncoder(w).Encode(data)
-}
 
 // HandleCreateUser : POST /api/users
 func (app *App) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -89,11 +37,10 @@ func (app *App) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetUser : GET /api/users/{id}?pk=...
 func (app *App) HandleGetUser(w http.ResponseWriter, r *http.Request) {
-	// 1. Récupération de l'ID via Go 1.22 PathValue
+	// 1. Récupération de l'id via le path
 	id := r.PathValue("id")
 
-	// 2. Récupération de la partitionKey (si nécessaire selon ta DB)
-	// Exemple: /api/users/123?pk=group1
+	// 2. Récupération de la partitionKey via le query param
 	pk := r.URL.Query().Get("pk")
 
 	// 3. Appel au Repository

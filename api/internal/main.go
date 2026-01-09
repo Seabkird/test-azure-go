@@ -20,7 +20,6 @@ type App struct {
 
 func main() {
 	// 1. Initialisation (Config, DB, etc.)
-
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		log.Fatalf("Erreur de credential: %v", err)
