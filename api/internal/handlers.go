@@ -17,7 +17,7 @@ type Reponse struct {
 
 type User struct {
 	//C'est crucial pour la performance et la sécurité des données entre tes clients.
-	TenantID string `json:"tenantId"` // Ta Partition Key (PK)Utilise le TenantID comme clé de partition (Partition Key).
+	TenantID string `json:"tenantID"` // Ta Partition Key (PK)Utilise le TenantID comme clé de partition (Partition Key).
 	Id       string `json:"id"`
 	Nom      string `json:"nom"`
 	Prenom   string `json:"prenom"`
