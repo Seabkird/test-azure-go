@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 // Tes structs de réponse (gardées ici pour l'exemple)
@@ -21,7 +23,7 @@ type User struct {
 	Prenom   string `json:"prenom"`
 }
 
-func (u User) GetID() string { return u.Nom }
+func (u User) GetID() string { return u.Id }
 
 // HandleHome : Ta route texte simple
 func HandleHome(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +58,7 @@ func HandleInfo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
+// HandleCreateUser : POST /api/users
 func (app *App) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	println("Appel de HandleCreateUser")
@@ -66,6 +69,10 @@ func (app *App) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Données invalides:"+user.Nom, http.StatusBadRequest)
 		return
 	}
+
+	user.Id = uuid.New().String()
+	// TODO: Récupérer le TenantID depuis le contexte/authentification
+	user.TenantID = "tenant_admin"
 
 	// 2. Appel au Repository
 	if err := app.userRepo.Create(r.Context(), user); err != nil {
