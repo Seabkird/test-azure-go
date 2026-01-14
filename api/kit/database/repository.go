@@ -11,11 +11,19 @@ type Entity interface {
 	GetTenantID() string
 }
 
+type UserFilter struct {
+	Category *string
+	MinAge   *int
+	IsActive *bool
+	Limit    int
+	Offset   int // Pour la pagination
+}
+
 // Repository définit les opérations CRUD standard.
 type Repository[T Entity] interface {
 	Create(ctx context.Context, item T) error
 	Read(ctx context.Context, id string, partitionKey string) (T, error)
 	Update(ctx context.Context, item T) error
 	Delete(ctx context.Context, id string, partitionKey string) error
-	// Tu pourras ajouter Query() plus tard
+	Search(ctx context.Context, filter UserFilter, partitionKey string) ([]T, error)
 }
