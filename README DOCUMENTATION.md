@@ -16,3 +16,4 @@
 ├── Router.tsx           # Définition des routes de l'application
 ├── theme.ts             # Surcharge du thème Mantine (Couleurs, Typographie)
 └── vite-env.d.ts        # Types TypeScript pour Vite
+
