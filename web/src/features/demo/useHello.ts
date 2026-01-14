@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchHello } from '../../lib/api'; // Import de l'étape A
+import { fetchHello } from './hello.api';
 
 export const useHello = () => {
   return useQuery({

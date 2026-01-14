@@ -1,5 +1,7 @@
 # Mantine Vite template
 
+cd /d D:\repos\test-azure-go\web
+
 ## Features
 
 This template comes with the following features:
