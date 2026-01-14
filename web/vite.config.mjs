@@ -12,7 +12,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', 
+        //target: 'http://localhost:8080', 
+        target: 'https://testing-go-hdg0a0fka7b3gsc4.francecentral-01.azurewebsites.net/', 
         changeOrigin: true,
         // Si ton backend s'attend à recevoir "/ping" et non "/api/ping", décommente la ligne ci-dessous :
         // rewrite: (path) => path.replace(/^\/api/, ''),
