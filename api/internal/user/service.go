@@ -31,15 +31,12 @@ type serviceImpl struct {
 	repo Repository
 }
 
-// NewService est le constructeur de la couche service.
-// On lui injecte le repository.
 func NewService(r Repository) Service {
 	return &serviceImpl{
 		repo: r,
 	}
 }
 
-// CreateUser implémente la logique de création.
 func (s *serviceImpl) CreateUser(ctx context.Context, tenantID string, input CreateUserInput) (*User, error) {
 	// 1. Nettoyage et validation de base des entrées
 	email := strings.ToLower(strings.TrimSpace(input.Email))

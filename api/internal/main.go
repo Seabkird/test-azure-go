@@ -5,54 +5,70 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
-	"test-api/kit/database"
+	"test-api/internal/api"
+	"test-api/internal/user"
 	"test-api/kit/database/cosmos"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/data/azcosmos"
 )
 
-// App contient toutes les dépendances partagées
-type App struct {
-	userRepo database.Repository[User]
-}
-
 func main() {
-	// 1. Initialisation (Config, DB, etc.)
+	log.Println("Démarrage de l'application...")
+
+	// =========================================================================
+	// Injection des dépendances
+	// =========================================================================
+
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		log.Fatalf("Erreur de credential: %v", err)
 	}
 
 	endpoint := os.Getenv("COSMOS_ENDPOINT")
+	// TODO: Dans un vrai projet, validez que endpoint n'est pas vide
 	client, err := azcosmos.NewClient(endpoint, cred, nil)
 	if err != nil {
 		log.Fatalf("Erreur création client Cosmos: %v", err)
 	}
 
-	repo, _ := cosmos.NewAdapter[User](client, "TestDB", "NomContainer")
-
-	// 2. Création de l'application avec ses dépendances
-	app := &App{
-		userRepo: repo,
+	userGenericAdapter, err := cosmos.NewAdapter[user.User](client, "TestDB", "UsersContainer")
+	if err != nil {
+		log.Fatalf("Impossible d'initialiser l'adaptateur Cosmos pour User: %v", err)
 	}
 
-	// 3. Configuration du serveur
+	// TODO on peut si besoin rajouter une petite methode setup dans le domaine user pour garder le main propre
+	// ( A voir si on fait un fichier spécifique ou bien juste rajouter dans le handler)
+	userRepo := user.NewCosmosRepository(userGenericAdapter)
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
+
+	// =========================================================================
+	// Configuration du Routeur HTTP (Chi)
+	// =========================================================================
+
+	httpHandler := api.NewRouter(userHandler)
+
+	// =========================================================================
+	// Configuration et démarrage du serveur
+	// =========================================================================
 	port := os.Getenv("FUNCTIONS_CUSTOMHANDLER_PORT")
 	if port == "" {
 		port = "8080"
 	}
 
 	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: app.Routes(),
+		Addr:         ":" + port,
+		Handler:      httpHandler,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	fmt.Println("Serveur lancé sur http://localhost:" + port)
 
-	// 4. Lancement
-	if err := srv.ListenAndServe(); err != nil {
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal("Erreur serveur : ", err)
 	}
 }

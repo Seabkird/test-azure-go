@@ -21,9 +21,11 @@
     │   └── response.go  // Helpers pour standardiser les réponses JSON (ex: respondWithJSON, respondWithError)
     │
     │   // --- DOMAINE : USER ---
-    ├── user/            // Tout ce qui concerne l'utilisateur est ISOLÉ ici
-    │   │
-    │
+    ├── internal/user/
+        ├── user.go // Contient souvent la struct principale 'User' et les interfaces clés
+        ├── service.go
+        ├── handler.go
+        └── cosmos.go // Pour l'implémentation DB spécifique
     │   // --- DOMAINE : FUTURE FEATURE (ex: PRODUCT) ---
     ├── product/
     │   ├── model.go

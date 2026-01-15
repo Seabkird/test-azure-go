@@ -72,6 +72,7 @@ type Filter struct {
 // Interfaces (Contrats)
 // =================================================================================
 
+// C'est pas con de garder les interfaces de service meme si c'est un peu overkill car ça sert de documentation simple au passage.
 // Service définit le contrat de la couche métier (Business Logic).
 type Service interface {
 	CreateUser(ctx context.Context, tenantID string, input CreateUserInput) (*User, error)
@@ -84,18 +85,10 @@ type Service interface {
 
 // Repository définit le contrat pour la couche de persistance (Base de données).
 type Repository interface {
-	// Create persiste un utilisateur complet.
 	Create(ctx context.Context, user *User) error
-
-	// GetByID récupère un utilisateur par sa clé composite (TenantID + ID).
 	GetByID(ctx context.Context, tenantID string, id string) (*User, error)
-
-	// Search exécute une recherche multi-critères.
-	Search(ctx context.Context, tenantID string, filter Filter) ([]User, error)
-
-	// Update met à jour un utilisateur existant.
 	Update(ctx context.Context, user *User) error
-
-	// Delete supprime un utilisateur.
 	Delete(ctx context.Context, tenantID string, id string) error
+
+	Search(ctx context.Context, tenantID string, filter Filter) ([]User, error)
 }

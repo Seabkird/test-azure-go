@@ -10,43 +10,22 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/data/azcosmos"
 
-	// Importez votre package générique.
-	// REMPLACEZ "test-api" PAR LE CHEMIN RÉEL DE VOTRE MODULE (ex: github.com/mon-user/mon-projet)
 	"test-api/kit/database/cosmos"
 )
 
 // cosmosRepository est l'implémentation spécifique du Repository pour le domaine User.
-// Elle est privée.
 type cosmosRepository struct {
-	// Composition : on embarque l'adapteur générique typé pour notre modèle User.
-	// C'est lui qui fera le gros du travail CRUD.
-	genericAdapter *cosmos.Adapter[User]
-
-	// On garde une référence au container client pour les requêtes spécifiques (Search)
-	// que l'adapteur générique ne peut pas gérer.
+	genericAdapter  *cosmos.Adapter[User]
 	containerClient *azcosmos.ContainerClient
 }
 
-// NewCosmosRepository est le constructeur.
-// Il initialise l'adapteur générique interne.
-// Notez qu'on retourne l'interface Repository, pas le type concret.
-func NewCosmosRepository(client *azcosmos.Client, dbName, containerName string) (Repository, error) {
-	// Initialisation de l'adapteur générique
-	adapter, err := cosmos.NewAdapter[User](client, dbName, containerName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create generic cosmos adapter for users: %w", err)
-	}
-
-	// On a besoin du container client brut pour le Search spécifique
-	// (Alternative: ajouter un getter GetContainer() sur votre Adapter générique)
-	// Pour cet exemple, on le récupère à la main ici, même si c'est un peu redondant avec NewAdapter.
-	db, _ := client.NewDatabase(dbName)
-	container, _ := db.NewContainer(containerName)
-
+func NewCosmosRepository(adapter *cosmos.Adapter[User]) Repository {
+	// On suppose que le kit a la méthode Container()
 	return &cosmosRepository{
-		genericAdapter:  adapter,
-		containerClient: container,
-	}, nil
+		genericAdapter: adapter,
+		// On récupère le client bas niveau depuis l'adaptateur
+		containerClient: adapter.Container(),
+	}
 }
 
 // =================================================================================

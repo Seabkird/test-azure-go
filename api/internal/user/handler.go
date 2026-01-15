@@ -10,13 +10,10 @@ import (
 )
 
 // Handler gère les requêtes HTTP pour le domaine User.
-// Il détient une instance du Service métier.
 type Handler struct {
 	service Service
 }
 
-// NewHandler est le constructeur du handler.
-// On lui injecte le service dont il a besoin.
 func NewHandler(s Service) *Handler {
 	return &Handler{
 		service: s,
@@ -36,20 +33,18 @@ func (h *Handler) RegisterRoutes(r chi.Router) {
 // Handlers HTTP
 // =================================================================================
 
-// Create gère POST /users
+// Create POST /users
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	// 1. Extraction du TenantID du contexte (crucial pour un SaaS)
-	// TODO : Cette fonction getTenantIDFromContext est un placeholder.
-	// Vous devez implémenter la logique réelle qui récupère ce que votre middleware d'auth a mis dans le contexte.
+	// Récupération du tenantID pour faire un return rapide si absent
 	tenantID, err := getTenantIDFromContext(ctx)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "Missing or invalid tenant context")
 		return
 	}
 
-	// 2. Décodage du corps JSON vers le DTO d'entrée (CreateUserInput)
+	// Décodage du corps JSON vers le DTO d'entrée (CreateUserInput)
 	var input CreateUserInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid JSON body")
@@ -57,16 +52,15 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	// 3. Appel à la couche métier (Service)
+	// Appel à la couche métier
 	newUser, err := h.service.CreateUser(ctx, tenantID, input)
 	if err != nil {
-		// Ici, vous pourriez vérifier le type d'erreur pour renvoyer 400 ou 409 (conflit)
+		// TODO Ici, vous pourriez vérifier le type d'erreur pour renvoyer 400 ou 409 (conflit)
 		// Pour simplifier, on renvoie 500 pour l'instant.
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// 4. Réponse HTTP (201 Created avec le nouvel utilisateur)
 	respondWithJSON(w, http.StatusCreated, newUser)
 }
 
@@ -87,7 +81,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Appel service
+	// Appel couche métier
 	user, err := h.service.GetUser(ctx, tenantID, id)
 	if err != nil {
 		// TODO: Vérifier si l'erreur est de type "Not Found" pour renvoyer 404
@@ -111,7 +105,7 @@ func (h *Handler) Search(w http.ResponseWriter, r *http.Request) {
 	// 1. Parsing des query parameters dans la struct Filter
 	filter := parseSearchFilter(r)
 
-	// 2. Appel service
+	// 2. Appel couche métier
 	users, err := h.service.SearchUsers(ctx, tenantID, filter)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -174,6 +168,7 @@ func respondWithError(w http.ResponseWriter, status int, message string) {
 // getTenantIDFromContext est un MOCK.
 // Dans votre vrai projet, cela devrait être une fonction exportée de votre package `kit/auth`.
 // Elle doit extraire le tenant ID que votre middleware d'authentification a placé dans le contexte.
+// TODO: Implémentez cette fonction selon votre logique d'authentification.
 func getTenantIDFromContext(ctx context.Context) (string, error) {
 	// EXEMPLE FICTIF :
 	// tenantID, ok := ctx.Value("tenant_id_key").(string)
@@ -182,5 +177,5 @@ func getTenantIDFromContext(ctx context.Context) (string, error) {
 
 	// Pour que l'exemple compile, je retourne une valeur fixe.
 	// A REMPLACER IMPERATIVEMENT PAR VOTRE LOGIQUE D'AUTH.
-	return "tenant-123-placeholder", nil
+	return "tenant_admin", nil
 }

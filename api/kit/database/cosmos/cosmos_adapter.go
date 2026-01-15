@@ -15,6 +15,10 @@ type Adapter[T database.Entity] struct {
 	container *azcosmos.ContainerClient
 }
 
+func (a *Adapter[T]) Container() *azcosmos.ContainerClient {
+	return a.container
+}
+
 // NewAdapter crée une nouvelle instance du repository.
 func NewAdapter[T database.Entity](client *azcosmos.Client, dbName, containerName string) (*Adapter[T], error) {
 	db, err := client.NewDatabase(dbName)
