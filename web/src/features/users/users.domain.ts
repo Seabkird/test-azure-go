@@ -1,0 +1,2 @@
+//mettre des regles metier si besoins 
+//Le DDD dans le front (votre fichier users.domain.ts) sert à organiser cette logique d'UX/Affichage pour qu'elle ne pollue pas vos composants visuels React, même si cette logique est une version "allégée" ou "dupliquée" des vraies règles backend.

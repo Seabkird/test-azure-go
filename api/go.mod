@@ -19,6 +19,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.20.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
+	github.com/go-chi/chi/v5 v5.2.4
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 )
