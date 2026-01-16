@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -31,6 +32,8 @@ func NewRouter(userHandler *user.Handler /*, productHandler *product.Handler */)
 	// Routes de base
 	// =========================================================================
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Health check déclenché : tout va bien")
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
