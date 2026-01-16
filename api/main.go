@@ -19,6 +19,12 @@ func main() {
 	log.SetOutput(os.Stdout)
 	log.Println("Démarrage de l'application...")
 
+	// Test d'écriture sur la sortie standard (Info)
+	fmt.Fprintf(os.Stdout, "--- main TEST LOG INFO SUR STDOUT ---\n")
+
+	// Test d'écriture sur la sortie d'erreur (Error)
+	fmt.Fprintf(os.Stderr, "--- main TEST LOG ERREUR SUR STDERR ---\n")
+
 	// =========================================================================
 	// Injection des dépendances
 	// =========================================================================
