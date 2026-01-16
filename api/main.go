@@ -25,6 +25,8 @@ func main() {
 	// Test d'écriture sur la sortie d'erreur (Error)
 	fmt.Fprintf(os.Stderr, "--- main TEST LOG ERREUR SUR STDERR ---\n")
 
+	os.Stdout.Sync()
+
 	// =========================================================================
 	// Injection des dépendances
 	// =========================================================================

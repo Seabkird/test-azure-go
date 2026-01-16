@@ -41,6 +41,8 @@ func NewRouter(userHandler *user.Handler /*, productHandler *product.Handler */)
 		// Test d'écriture sur la sortie d'erreur (Error)
 		fmt.Fprintf(os.Stderr, "--- health TEST LOG ERREUR SUR STDERR ---\n")
 
+		os.Stdout.Sync()
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
