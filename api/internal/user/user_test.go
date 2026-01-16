@@ -14,6 +14,7 @@ import (
 
 	"test-api/internal/user"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -78,6 +79,64 @@ func TestCreateUser_Flow(t *testing.T) {
 
 	require.True(t, exists, "L'utilisateur doit être trouvé avec la clé tenant#id")
 	assert.Equal(t, emailToCreate, storedUser.Email)
+}
+func TestGetUser_Flow(t *testing.T) {
+	// 1. SETUP
+	fakeRepo := newFakeUserRepository()
+	svc := user.NewService(fakeRepo)
+	handler := user.NewHandler(svc)
+
+	const testTenantID = "tenant-456"
+	testUserID := uuid.NewString()
+	expectedEmail := "leodagan@kaamelott.com"
+
+	// PRÉ-POPULATION
+	existingUser := user.User{
+		ID:       testUserID,
+		TenantID: testTenantID,
+		Email:    expectedEmail,
+		Nom:      "De Carmelide",
+		Prenom:   "Léodagan",
+	}
+	fakeRepo.data[makeKey(testTenantID, testUserID)] = existingUser
+
+	// --- CORRECTION ICI : ON SETUP UN ROUTEUR CHI ---
+	// On crée un mini-routeur juste pour ce test afin que chi.URLParam fonctionne.
+	r := chi.NewRouter()
+	// On enregistre le handler sur une route avec le paramètre {id}
+	r.Get("/users/{id}", handler.GetByID)
+	// ------------------------------------------------
+
+	// 2. PRÉPARATION DE LA REQUÊTE
+	// L'URL doit correspondre au pattern défini ci-dessus
+	targetURL := fmt.Sprintf("/users/%s", testUserID)
+	req := httptest.NewRequest(http.MethodGet, targetURL, nil)
+
+	// Injection du TenantID dans le contexte (simulation du middleware auth)
+	ctx := context.WithValue(req.Context(), user.TenantIDContextKey, testTenantID)
+	req = req.WithContext(ctx)
+
+	rr := httptest.NewRecorder()
+
+	// 3. ACTION
+	// --- CORRECTION ICI : ON PASSE PAR LE ROUTEUR ---
+	// Au lieu d'appeler handler.GetByID directement, on laisse le routeur faire son travail.
+	r.ServeHTTP(rr, req)
+	// -----------------------------------------------
+
+	// 4. ASSERTIONS HTTP
+	resp := rr.Result()
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode, "Le statut devrait être 200 OK")
+
+	var respUser user.User
+	err := json.NewDecoder(resp.Body).Decode(&respUser)
+	require.NoError(t, err, "Le JSON de réponse doit être valide")
+
+	assert.Equal(t, testUserID, respUser.ID)
+	assert.Equal(t, testTenantID, respUser.TenantID)
+	assert.Equal(t, expectedEmail, respUser.Email)
 }
 
 // =====================================================================================
