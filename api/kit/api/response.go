@@ -33,7 +33,7 @@ func RespondWithError(w http.ResponseWriter, err error) {
 	// Par défaut, si on ne reconnaît pas l'erreur, c'est un problème interne (500)
 	// et on ne fuite pas les détails techniques au client.
 	statusCode := http.StatusInternalServerError
-	publicMessage := "Internal Server Error"
+	publicMessage := err.Error()
 
 	// --- ICI viendra plus tard la logique de détection ---
 	// Exemple futur (ne pas implémenter maintenant) :
