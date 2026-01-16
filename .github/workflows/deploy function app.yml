@@ -13,7 +13,7 @@ env:
   AZURE_FUNCTIONAPP_NAME: 'testing-go'  
   GO_VERSION: '1.25'                              # La version de Go que tu utilises
   # Assure-toi que ce nom correspond à "defaultExecutablePath" dans ton host.json
-  BINARY_NAME: 'main' 
+  BINARY_NAME: 'test-api' 
 
 jobs:
   build-and-deploy:
