@@ -70,13 +70,11 @@ func (r *cosmosRepository) Delete(ctx context.Context, tenantID string, id strin
 // Méthodes de Recherche Spécifiques (Implémentation directe ici)
 // =================================================================================
 
-// Search implémente la recherche multicritères spécifique aux utilisateurs.
-// Elle ne PEUT PAS être dans l'adapteur générique car elle manipule c.nom et c.email.
+// Search implémente la recherche multicritères spécifique aux users.
 func (r *cosmosRepository) Search(ctx context.Context, tenantID string, filter Filter) ([]User, error) {
-	// 1. Définition de la partition key pour scoper la recherche
 	pk := azcosmos.NewPartitionKeyString(tenantID)
 
-	// 2. Construction de la requête SQL de base
+	// Construction de la requête SQL de base
 	// IMPORTANT : On filtre TOUJOURS par tenantID dans la clause WHERE pour la sécurité.
 	queryBuilder := strings.Builder{}
 	queryBuilder.WriteString("SELECT * FROM c WHERE c.tenantID = @tenantId")
@@ -86,7 +84,7 @@ func (r *cosmosRepository) Search(ctx context.Context, tenantID string, filter F
 		{Name: "@tenantId", Value: tenantID},
 	}
 
-	// 3. Ajout dynamique des filtres optionnels
+	// Ajout dynamique des filtres optionnels
 	if filter.Nom != nil {
 		queryBuilder.WriteString(" AND c.nom = @nom")
 		params = append(params, azcosmos.QueryParameter{Name: "@nom", Value: *filter.Nom})
@@ -97,8 +95,7 @@ func (r *cosmosRepository) Search(ctx context.Context, tenantID string, filter F
 		params = append(params, azcosmos.QueryParameter{Name: "@email", Value: *filter.Email})
 	}
 
-	// 4. Ajout de la pagination (ORDER BY obligatoire pour OFFSET/LIMIT)
-	// On trie par défaut sur la date système (_ts) ou l'ID pour avoir un ordre stable.
+	// Ajout de la pagination (ORDER BY obligatoire pour OFFSET/LIMIT)
 	queryBuilder.WriteString(" ORDER BY c._ts DESC")
 
 	if filter.Limit > 0 {
@@ -107,20 +104,17 @@ func (r *cosmosRepository) Search(ctx context.Context, tenantID string, filter F
 		params = append(params, azcosmos.QueryParameter{Name: "@limit", Value: filter.Limit})
 	}
 
-	// 5. Préparation des options de requête
+	// Préparation des options de requête
 	queryOptions := azcosmos.QueryOptions{
 		QueryParameters: params,
-		// Optionnel : Si votre requête est très lourde et que vous voulez optimiser,
-		// vous pouvez setter explicitement la partition key dans les options ici aussi.
-		// PartitionKey: &pk,
 	}
 
-	// 6. Exécution avec le Pager (via le container client brut)
+	// Exécution avec le Pager (via le container client brut)
 	// Note : Votre Adapteur générique pourrait exposer une méthode "ExecuteQuery" pour éviter
 	// d'avoir accès au containerClient ici, mais pour l'instant, faisons simple.
 	pager := r.containerClient.NewQueryItemsPager(queryBuilder.String(), pk, &queryOptions)
 
-	// 7. Boucle de récupération des résultats
+	// Boucle de récupération des résultats
 	// Vous pouvez réutiliser la méthode privée de votre adapteur si elle existe,
 	// sinon on duplique cette boucle standard ici.
 	var results []User
