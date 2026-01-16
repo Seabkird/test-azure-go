@@ -20,7 +20,7 @@
   },
   "customHandler": {
     "description": {
-      "defaultExecutablePath": "main",
+      "defaultExecutablePath": "test-api",
       "workingDirectory": "",
       "arguments": []
     },

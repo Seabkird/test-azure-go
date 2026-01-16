@@ -20,7 +20,11 @@ func NewHandler(s Service) *Handler {
 	}
 }
 
-// RegisterRoutes permet au handler d'enregistrer ses propres routes sur un routeur parent.
+// RegisterRoutes définit les points d'entrée HTTP pour le module User.
+//
+// GET /users : Recherche des utilisateurs
+// POST /users : Création d'un utilisateur
+// GET /users/{id} : Récupération d'un utilisateur par son ID
 func (h *Handler) RegisterRoutes(r chi.Router) {
 	r.Post("/", h.Create)
 	r.Get("/", h.Search)
