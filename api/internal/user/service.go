@@ -8,6 +8,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type serviceImpl struct {
+	repo Repository
+}
+
 // -- Définition des erreurs métier --
 
 var ErrUserNotFound = fmt.Errorf("user not found")
@@ -26,10 +30,6 @@ func (e ErrInvalidInput) Error() string {
 // =================================================================================
 // Implémentation du Service
 // =================================================================================
-
-type serviceImpl struct {
-	repo Repository
-}
 
 func NewService(r Repository) Service {
 	return &serviceImpl{

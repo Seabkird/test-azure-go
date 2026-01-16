@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -59,6 +60,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	// Appel à la couche métier
 	newUser, err := h.service.CreateUser(ctx, tenantID, input)
 	if err != nil {
+		fmt.Printf("[SERVICE ERROR] Erreur lors de la création de l'utilisateur: %v\n", err)
 		// TODO Ici, vous pourriez vérifier le type d'erreur pour renvoyer 400 ou 409 (conflit)
 		// Pour simplifier, on renvoie 500 pour l'instant.
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -169,17 +171,35 @@ func respondWithError(w http.ResponseWriter, status int, message string) {
 	respondWithJSON(w, status, map[string]string{"error": message})
 }
 
+// EXEMPLE FICTIF d'implementation du middleware :
+// tenantID, ok := ctx.Value("tenant_id_key").(string)
+// if !ok || tenantID == "" { return "", fmt.Errorf("no tenant id found") }
+// return tenantID, nil
+
+// Pour que l'exemple compile, je retourne une valeur fixe.
+// A REMPLACER IMPERATIVEMENT PAR VOTRE LOGIQUE D'AUTH.
+
 // getTenantIDFromContext est un MOCK.
 // Dans votre vrai projet, cela devrait être une fonction exportée de votre package `kit/auth`.
 // Elle doit extraire le tenant ID que votre middleware d'authentification a placé dans le contexte.
 // TODO: Implémentez cette fonction selon votre logique d'authentification.
 func getTenantIDFromContext(ctx context.Context) (string, error) {
-	// EXEMPLE FICTIF :
-	// tenantID, ok := ctx.Value("tenant_id_key").(string)
-	// if !ok || tenantID == "" { return "", fmt.Errorf("no tenant id found") }
-	// return tenantID, nil
+	// 1. On essaie de lire la valeur injectée par le test (ou plus tard, le middleware)
+	// On utilise la constante publique définie dans user.go
+	val := ctx.Value(TenantIDContextKey)
 
-	// Pour que l'exemple compile, je retourne une valeur fixe.
-	// A REMPLACER IMPERATIVEMENT PAR VOTRE LOGIQUE D'AUTH.
-	return "tenant_admin", nil
+	// 2. Si ça existe et que c'est une string non vide, on l'utilise.
+	if tenantID, ok := val.(string); ok && tenantID != "" {
+		return tenantID, nil
+	}
+
+	// 3. Fallback ou Erreur.
+	// Pour le test, si on n'a rien mis dans le contexte, c'est une erreur.
+	// Cela forcera le handler à renvoyer une 401 Unauthorized, ce qui est correct.
+	return "", fmt.Errorf("no tenant ID found in context (mock implementation)")
+
+	// Note : Si vous voulez garder un comportement par défaut "tenant_admin" pour
+	// d'autres tests locaux hors de ce fichier, vous pouvez le remettre ici en fallback,
+	// mais cela risque de masquer des erreurs dans vos tests.
+	// return "tenant_admin", nil
 }

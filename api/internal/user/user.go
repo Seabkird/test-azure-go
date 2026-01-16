@@ -68,6 +68,13 @@ type Filter struct {
 	Limit  int
 }
 
+// TODO Valider qu'il s'agit d'une bonne pratique en go
+// TenantIDContextKey est la clé publique utilisée pour passer le tenantID dans le contexte.
+// Le middleware d'auth écrira avec cette clé, le handler lira avec cette clé, et le test injectera avec cette clé.
+type contextKey string
+
+const TenantIDContextKey contextKey = "x-tenant-id"
+
 // =================================================================================
 // Interfaces (Contrats)
 // =================================================================================

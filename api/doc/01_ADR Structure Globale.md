@@ -39,7 +39,7 @@ Les microservices ont été écartés pour le moment afin d'éviter une complexi
 └── internal/            // Cœur de votre application métier (non importable de l'extérieur)
     │
     ├── api/             // Couche HTTP globale
-    │   ├── router.go    // Configuration des routes (Chi, Gin, Echo...)
+    │   ├── router.go    // Configuration des routes Chi
     │   └── response.go  // Helpers pour standardiser les réponses JSON (ex: respondWithJSON, respondWithError)
     │
     │   // --- DOMAINE : USER ---
