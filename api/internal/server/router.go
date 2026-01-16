@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	// Importez les packages de vos domaines pour accéder aux handlers
 	"test-api/internal/user"
 )
 

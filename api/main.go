@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+	log.SetOutput(os.Stdout)
 	log.Println("Démarrage de l'application...")
 
 	// =========================================================================
