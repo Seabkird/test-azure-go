@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"test-api/internal/api"
+	"test-api/internal/server"
 	"test-api/internal/user"
 	"test-api/kit/database/cosmos"
 
@@ -49,7 +49,7 @@ func main() {
 	// Configuration du Routeur HTTP (Chi)
 	// =========================================================================
 
-	httpHandler := api.NewRouter(userHandler)
+	httpHandler := server.NewRouter(userHandler)
 
 	// =========================================================================
 	// Configuration et démarrage du serveur

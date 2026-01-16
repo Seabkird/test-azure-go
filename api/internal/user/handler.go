@@ -3,9 +3,11 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"test-api/kit/api"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -45,14 +47,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	// Récupération du tenantID pour faire un return rapide si absent
 	tenantID, err := getTenantIDFromContext(ctx)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Missing or invalid tenant context")
+		api.RespondWithError(w, err)
 		return
 	}
 
 	// Décodage du corps JSON vers le DTO d'entrée (CreateUserInput)
 	var input CreateUserInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid JSON body")
+		api.RespondWithError(w, err)
 		return
 	}
 	defer r.Body.Close()
@@ -63,11 +65,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("[SERVICE ERROR] Erreur lors de la création de l'utilisateur: %v\n", err)
 		// TODO Ici, vous pourriez vérifier le type d'erreur pour renvoyer 400 ou 409 (conflit)
 		// Pour simplifier, on renvoie 500 pour l'instant.
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		api.RespondWithError(w, err)
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, newUser)
+	api.RespondWithJSON(w, http.StatusCreated, newUser)
 }
 
 // GetByID gère GET /users/{id}
@@ -76,14 +78,14 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	tenantID, err := getTenantIDFromContext(ctx)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+		api.RespondWithError(w, err)
 		return
 	}
 
 	// Extraction de l'ID depuis l'URL (syntaxe dépendant de votre routeur, ici Chi)
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		respondWithError(w, http.StatusBadRequest, "Missing ID parameter")
+		api.RespondWithError(w, errors.New("missing id parameter"))
 		return
 	}
 
@@ -91,11 +93,11 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	user, err := h.service.GetUser(ctx, tenantID, id)
 	if err != nil {
 		// TODO: Vérifier si l'erreur est de type "Not Found" pour renvoyer 404
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		api.RespondWithError(w, err)
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, user)
+	api.RespondWithJSON(w, http.StatusOK, user)
 }
 
 // Search gère GET /users?nom=...&email=...&limit=10
@@ -104,7 +106,7 @@ func (h *Handler) Search(w http.ResponseWriter, r *http.Request) {
 
 	tenantID, err := getTenantIDFromContext(ctx)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+		api.RespondWithError(w, err)
 		return
 	}
 
@@ -114,7 +116,7 @@ func (h *Handler) Search(w http.ResponseWriter, r *http.Request) {
 	// 2. Appel couche métier
 	users, err := h.service.SearchUsers(ctx, tenantID, filter)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		api.RespondWithError(w, err)
 		return
 	}
 
@@ -122,7 +124,7 @@ func (h *Handler) Search(w http.ResponseWriter, r *http.Request) {
 	if users == nil {
 		users = []User{}
 	}
-	respondWithJSON(w, http.StatusOK, users)
+	api.RespondWithJSON(w, http.StatusOK, users)
 }
 
 // =================================================================================
@@ -156,19 +158,6 @@ func parseSearchFilter(r *http.Request) Filter {
 	filter.Offset = offset
 
 	return filter
-}
-
-// respondWithJSON écrit une réponse JSON standard.
-func respondWithJSON(w http.ResponseWriter, status int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	// En prod, gérez l'erreur d'encodage, mais c'est rare qu'elle arrive si payload est valide.
-	_ = json.NewEncoder(w).Encode(payload)
-}
-
-// respondWithError écrit une réponse d'erreur JSON standard.
-func respondWithError(w http.ResponseWriter, status int, message string) {
-	respondWithJSON(w, status, map[string]string{"error": message})
 }
 
 // EXEMPLE FICTIF d'implementation du middleware :
