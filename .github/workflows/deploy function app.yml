@@ -10,7 +10,7 @@ on:
   workflow_dispatch: # Permet de lancer le déploiement manuellement depuis l'interface GitHub si besoin
 
 env:
-  AZURE_FUNCTIONAPP_NAME: 'testing-go'  
+  AZURE_FUNCTIONAPP_NAME: 'test-go-logging'  
   GO_VERSION: '1.25'                              # La version de Go que tu utilises
   # Assure-toi que ce nom correspond à "defaultExecutablePath" dans ton host.json
   BINARY_NAME: 'test-api' 
