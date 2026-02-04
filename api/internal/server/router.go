@@ -7,33 +7,30 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"test-api/internal/server"
 	"test-api/internal/user"
+	"test-api/kit/logger"
 )
 
-// NewRouter initialise le routeur Chi principal.
-func NewRouter(userHandler *user.Handler /*, productHandler *product.Handler */) http.Handler {
+func NewRouter(userHandler *user.Handler) http.Handler {
 	r := chi.NewRouter()
 
 	// =========================================================================
 	// Middlewares Globaux
 	// =========================================================================
-	// RequestID ajoute un ID unique à chaque requête (utile pour les logs)
 	r.Use(middleware.RequestID)
-	// Logger logge les détails de la requête HTTP entrante
-	r.Use(middleware.Logger)
-	// Recoverer empêche le serveur de planter en cas de panic dans un handler
 	r.Use(middleware.Recoverer)
-	r.Use(AzureTraceMiddleware)
 
-	// Vous pouvez ajouter vos propres middlewares ici (ex: auth globale, CORS)
-	// r.Use(myAuthMiddleware)
+	// 2. On utilise le Middleware de notre nouveau package "logger"
+	// (Remplace "middleware.Logger" de Chi qui fait des logs texte moches)
+	r.Use(logger.Middleware)
 
 	// =========================================================================
 	// Routes de base
 	// =========================================================================
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		server.Log(r.Context()).Info("Health check déclenché : tout va bien")
+		// 3. UTILISATION PROPRE : On appelle le package logger importé
+		logger.Info(r.Context(), "Health check déclenché : tout va bien")
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
