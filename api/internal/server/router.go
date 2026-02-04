@@ -2,10 +2,8 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -35,14 +33,6 @@ func NewRouter(userHandler *user.Handler /*, productHandler *product.Handler */)
 	// =========================================================================
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Health check déclenché : tout va bien")
-		// Test d'écriture sur la sortie standard (Info)
-		fmt.Fprintf(os.Stdout, "--- health TEST LOG INFO SUR STDOUT ---\n")
-
-		// Test d'écriture sur la sortie d'erreur (Error)
-		fmt.Fprintf(os.Stderr, "--- health TEST LOG ERREUR SUR STDERR ---\n")
-
-		os.Stdout.Sync()
-
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
