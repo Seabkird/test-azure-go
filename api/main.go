@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -16,7 +17,9 @@ import (
 )
 
 func main() {
-	log.Println("Démarrage de l'application...")
+	server.InitLogger()
+
+	slog.Info("Démarrage de l'application...")
 
 	// =========================================================================
 	// Injection des dépendances
@@ -24,19 +27,19 @@ func main() {
 
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
-		log.Fatalf("Erreur de credential: %v", err)
+		slog.Error("Erreur de credential: %v", err)
 	}
 
 	endpoint := os.Getenv("COSMOS_ENDPOINT")
 	// TODO: Dans un vrai projet, validez que endpoint n'est pas vide
 	client, err := azcosmos.NewClient(endpoint, cred, nil)
 	if err != nil {
-		log.Fatalf("Erreur création client Cosmos: %v", err)
+		slog.Error("Erreur création client Cosmos: %v", err)
 	}
 
 	userGenericAdapter, err := cosmos.NewAdapter[user.User](client, "TestDB", "UsersContainer")
 	if err != nil {
-		log.Fatalf("Impossible d'initialiser l'adaptateur Cosmos pour User: %v", err)
+		slog.Error("Impossible d'initialiser l'adaptateur Cosmos pour User: %v", err)
 	}
 
 	// TODO on peut si besoin rajouter une petite methode setup dans le domaine user pour garder le main propre

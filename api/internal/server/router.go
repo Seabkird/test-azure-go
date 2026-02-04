@@ -24,6 +24,7 @@ func NewRouter(userHandler *user.Handler /*, productHandler *product.Handler */)
 	r.Use(middleware.Logger)
 	// Recoverer empêche le serveur de planter en cas de panic dans un handler
 	r.Use(middleware.Recoverer)
+	r.Use(AzureTraceMiddleware)
 
 	// Vous pouvez ajouter vos propres middlewares ici (ex: auth globale, CORS)
 	// r.Use(myAuthMiddleware)
